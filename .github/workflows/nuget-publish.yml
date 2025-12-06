@@ -1,0 +1,54 @@
+name: Build & Publish NuGet
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - "**"
+
+jobs:
+    build-and-pack:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: "8.0.x"
+
+            - name: Restore dependencies
+              run: dotnet restore Common/Common.csproj
+
+            - name: Determine version
+              id: version
+              run: |
+                  BASE_VERSION="1.0.0"
+                  if [[ "${GITHUB_REF}" == "refs/heads/master" ]]; then
+                    VERSION=$BASE_VERSION
+                  else
+                    # Get branch name
+                    BRANCH_NAME=$(echo "${GITHUB_HEAD_REF}" | tr / _)
+                    # Generate incremental number (we'll use short commit hash here as simple "unique" for simplicity)
+                    INC=$(git rev-list --count HEAD)
+                    VERSION="${BASE_VERSION}_${BRANCH_NAME}_${INC}"
+                  fi
+                  echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
+
+            - name: Build & Pack
+              run: |
+                  dotnet pack Common/Common.csproj \
+                    -c Release \
+                    -p:PackageVersion=$PACKAGE_VERSION \
+                    -o ./nupkgs
+
+            - name: Push to NuGet
+              env:
+                  NUGET_API_KEY: ${{ secrets.ORG_NUGET_API_KEY }}
+              run: |
+                  dotnet nuget push ./nupkgs/*.nupkg \
+                    --source "https://your-org-nuget-url" \
+                    --api-key $NUGET_API_KEY

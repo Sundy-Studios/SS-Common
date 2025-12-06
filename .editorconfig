@@ -1,0 +1,30 @@
+# top-most EditorConfig file
+root = true
+
+[*]
+# General EditorConfig settings
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.cs]
+# C# specific settings
+# Naming styles
+dotnet_naming_style.pascal_case_public_members.capitalization = pascal_case
+dotnet_naming_style.pascal_case_public_members.required_modifiers = public
+dotnet_naming_style.pascal_case_public_members.required_symbols = property, method, field, event
+
+# Code style rules (example: require braces for control statements)
+csharp_style_control_statements_info.braces = true:suggestion
+
+# Using directive preferences
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# Remove unused usings
+dotnet_diagnostic.IDE0005.severity = warning
+dotnet_diagnostic.IDE0058.severity = none
+dotnet_diagnostic.xUnit1031.severity = none
+
+# Prefer file-scoped namespaces (C# 10+)
+csharp_style_namespace_declarations = file_scoped:suggestion

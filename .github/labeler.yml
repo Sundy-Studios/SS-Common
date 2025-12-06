@@ -1,0 +1,13 @@
+# Label PR as 'enhancement' if branch or PR title includes 'feature' or 'enhancement'
+enhancement:
+    - "feature*"
+    - "*enhancement*"
+
+# Label PR as 'bug' if branch or PR title includes 'bug' or 'fix'
+bug:
+    - "bug*"
+    - "*fix*"
+
+# Label PR as 'hotfix' if branch includes 'hotfix'
+hotfix:
+    - "hotfix*"
