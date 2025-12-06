@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - master
+            - main
     pull_request:
         branches:
             - "**"
@@ -37,6 +38,7 @@ jobs:
                     VERSION="${BASE_VERSION}_${BRANCH_NAME}_${INC}"
                   fi
                   echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
+                  echo "Version set to $VERSION"
 
             - name: Build & Pack
               run: |
