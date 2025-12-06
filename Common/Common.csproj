@@ -11,11 +11,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Common</PackageId>
     <Version>1.0.0</Version>
-    <Authors>YourName</Authors>
-    <Company>YourCompany</Company>
+    <Authors>Sundy Studio</Authors>
+    <Company>Sundy Studio</Company>
     <Description>A collection of guard clauses and utility methods for safe coding practices.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/Sundy-Studios/SS-Common</RepositoryUrl>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Common</AssemblyName>
   </PropertyGroup>
 
 </Project>
