@@ -54,6 +54,7 @@ jobs:
                     -c Release \
                     -p:PackageVersion=$PACKAGE_VERSION \
                     -o ./nupkgs
+                    /p:IncludeBuildOutput=true
 
             - name: Push to NuGet
               env:
