@@ -50,11 +50,13 @@ jobs:
 
             - name: Build & Pack
               run: |
+                  dotnet build Common/Common.csproj -c Release
+
                   dotnet pack Common/Common.csproj \
                     -c Release \
                     -p:PackageVersion=$PACKAGE_VERSION \
+                    -p:IncludeBuildOutput=true \
                     -o ./nupkgs
-                    /p:IncludeBuildOutput=true
 
             - name: Push to NuGet
               env:
