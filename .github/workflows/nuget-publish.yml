@@ -69,4 +69,3 @@ jobs:
                   dotnet nuget push ./nupkgs/*.nupkg \
                     --source "https://nuget.pkg.github.com/Sundy-Studios/index.json" \
                     --api-key "$GITHUB_TOKEN"
-                    --skip-duplicate
