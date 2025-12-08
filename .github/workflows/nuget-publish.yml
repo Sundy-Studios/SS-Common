@@ -60,7 +60,7 @@ jobs:
 
             - name: Push to NuGet
               env:
-                  NUGET_API_KEY: ${{ secrets.ORG_NUGET_API_KEY }}
+                  NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
               run: |
                   dotnet nuget push ./nupkgs/*.nupkg \
                     --source "https://your-org-nuget-url" \
