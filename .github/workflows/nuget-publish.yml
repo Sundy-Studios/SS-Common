@@ -58,11 +58,10 @@ jobs:
                     -p:IncludeBuildOutput=true \
                     -o ./nupkgs
 
-            - name: Push to NuGet
+            - name: Push to Github Package
               env:
-                  NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+                  NUGET_API_KEY: ${{ secrets.GITHUB_TOKEN  }}
               run: |
                   dotnet nuget push ./nupkgs/*.nupkg \
-                    --source "https://api.nuget.org/v3/index.json" \
-                    --api-key $NUGET_API_KEY \
-                    --skip-duplicate
+                    --source "https://nuget.pkg.github.com/Sundy-Studios/index.json" \
+                    --api-key "$GITHUB_TOKEN"
