@@ -5,9 +5,17 @@ on:
         branches:
             - master
             - main
+        paths:
+            - "Common/**"
+            - "Directory.Packages.props"
+            - "Directory.Build.props"
     pull_request:
         branches:
             - "**"
+        paths:
+            - "Common/**"
+            - "Directory.Packages.props"
+            - "Directory.Build.props"
 
 permissions:
     contents: read
@@ -16,9 +24,12 @@ permissions:
 jobs:
     build-and-pack:
         runs-on: ubuntu-latest
+
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
 
             - name: Setup .NET
               uses: actions/setup-dotnet@v3
@@ -28,29 +39,28 @@ jobs:
             - name: Restore dependencies
               run: dotnet restore Common/Common.csproj
 
-            - name: Determine version
-              id: version
+            - name: Determine version from csproj
               run: |
-                  BASE_VERSION="1.0.0"
+                  BASE_VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" Common/Common.csproj)
 
-                  # Determine branch name
                   if [[ -n "${GITHUB_HEAD_REF}" ]]; then
-                  BRANCH_NAME="${GITHUB_HEAD_REF}"
+                      BRANCH_NAME="${GITHUB_HEAD_REF}"
                   else
-                  BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+                      BRANCH_NAME="${GITHUB_REF#refs/heads/}"
                   fi
 
-                  # Normalize
                   BRANCH_NAME=$(echo "$BRANCH_NAME" | tr / - | tr '[:upper:]' '[:lower:]')
 
-                  # Incremental count
                   INC=$(git rev-list --count HEAD)
 
-                  # Always append branch name and count
-                  VERSION="${BASE_VERSION}-${BRANCH_NAME}.${INC}"
+                  if [[ "$BRANCH_NAME" == "main" || "$BRANCH_NAME" == "master" ]]; then
+                      VERSION="$BASE_VERSION"
+                  else
+                      VERSION="${BASE_VERSION}-${BRANCH_NAME}.${INC}"
+                  fi
 
                   echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
-                  echo "Version set to $VERSION"
+                  echo "Using version $VERSION"
 
             - name: Build & Pack
               run: |
@@ -68,4 +78,5 @@ jobs:
               run: |
                   dotnet nuget push ./nupkgs/*.nupkg \
                     --source "https://nuget.pkg.github.com/Sundy-Studios/index.json" \
-                    --api-key "$GITHUB_TOKEN"
+                    --api-key "$GITHUB_TOKEN" \
+                    --skip-duplicate
