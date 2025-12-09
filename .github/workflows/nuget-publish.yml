@@ -51,6 +51,7 @@ jobs:
 
                   BRANCH_NAME=$(echo "$BRANCH_NAME" | tr / - | tr '[:upper:]' '[:lower:]')
 
+                  RAW=$(uuidgen | tr '[:upper:]' '[:lower:]')
                   SHORT=${RAW:0:8}
 
                   if [[ "$BRANCH_NAME" == "main" || "$BRANCH_NAME" == "master" ]]; then
