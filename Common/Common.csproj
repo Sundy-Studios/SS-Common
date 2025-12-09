@@ -10,7 +10,7 @@
     <!-- NuGet package settings -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Common</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Sundy Studio</Authors>
     <Company>Sundy Studio</Company>
     <Description>A collection of guard clauses and utility methods for safe coding practices.</Description>

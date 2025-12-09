@@ -31,9 +31,6 @@ jobs:
               with:
                   fetch-depth: 0
 
-            - name: Fetch main
-              run: git fetch origin main:main
-
             - name: Setup .NET
               uses: actions/setup-dotnet@v3
               with:
@@ -54,21 +51,13 @@ jobs:
 
                   BRANCH_NAME=$(echo "$BRANCH_NAME" | tr / - | tr '[:upper:]' '[:lower:]')
 
-                  # Determine the parent branch
-                  # Usually we want the branch this branch is based on; for PRs, GitHub sets GITHUB_BASE_REF
-                  if [[ -n "$GITHUB_BASE_REF" ]]; then
-                      PARENT_BRANCH="$GITHUB_BASE_REF"
-                  else
-                      PARENT_BRANCH="main"
-                  fi
-
-                  # Count commits on this branch not in the parent
-                  INC=$(git rev-list --count $PARENT_BRANCH..HEAD)
+                  RAW=$(uuidgen | tr '[:upper:]' '[:lower:]')
+                  SHORT=${RAW:0:8}
 
                   if [[ "$BRANCH_NAME" == "main" || "$BRANCH_NAME" == "master" ]]; then
                       VERSION="$BASE_VERSION"
                   else
-                      VERSION="${BASE_VERSION}-${BRANCH_NAME}.${INC}"
+                      VERSION="${BASE_VERSION}-${BRANCH_NAME}.${SHORT}"
                   fi
 
                   echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
