@@ -1,17 +1,39 @@
-name: "Auto Label Pull Requests"
+name: "Validate PR Labels"
 
 on:
     pull_request:
         types: [opened, edited, reopened, synchronize]
 
 jobs:
-    labeler:
+    validate-labels:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
-
-            - name: Apply PR labels
-              uses: actions/labeler@v4
+            - name: Check PR labels
+              uses: actions/github-script@v7
               with:
-                  repo-token: "${{ secrets.GITHUB_TOKEN }}"
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      // Define categories and allowed labels
+                      const categories = {
+                        type: ["Type: Enhancement", "Type: Fix", "Type: Hot Fix"]
+                        // Later you can add:
+                        // team: ["Team: Backend", "Team: Frontend", ...],
+                        // squad: ["Squad: Alpha", "Squad: Beta", ...]
+                      };
+
+                      const prNumber = context.payload.pull_request.number;
+                      const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber
+                      });
+
+                      for (const [category, allowed] of Object.entries(categories)) {
+                        const matching = labels.filter(label => allowed.includes(label.name));
+                        if (matching.length === 0) {
+                          throw new Error(`PR must have **one** label for category '${category}' (${allowed.join(", ")})`);
+                        }
+                        if (matching.length > 1) {
+                          throw new Error(`PR has multiple labels for category '${category}'. Only one is allowed.`);
+                        }
+                      }
