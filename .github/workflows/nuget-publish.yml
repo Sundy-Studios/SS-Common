@@ -38,6 +38,10 @@ jobs:
               with:
                   dotnet-version: "8.0.x"
 
+            - name: Fetch parent branch
+              if: ${{ env.GITHUB_BASE_REF != '' }}
+              run: git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
+
             - name: Restore dependencies
               run: dotnet restore Common/Common.csproj
 
