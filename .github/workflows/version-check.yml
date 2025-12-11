@@ -1,0 +1,54 @@
+name: Version Check
+
+on:
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+        paths:
+            - "Common/**"
+
+jobs:
+    verify-version:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout current branch
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Get current version from Common.csproj
+              id: current
+              run: |
+                  CURRENT_VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" Common/Common.csproj)
+                  echo "current=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+                  echo "Current version is $CURRENT_VERSION"
+
+            - name: Checkout base commit (the branch the PR is merging into)
+              run: |
+                  git fetch origin ${{ github.base_ref }} --depth=1
+                  git checkout origin/${{ github.base_ref }}
+
+            - name: Get base version from Common.csproj
+              id: base
+              run: |
+                  BASE_VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" Common/Common.csproj || echo "0.0.0")
+                  echo "base=$BASE_VERSION" >> "$GITHUB_OUTPUT"
+                  echo "Base version is $BASE_VERSION"
+
+            - name: Compare versions
+              run: |
+                  CURRENT="${{ steps.current.outputs.current }}"
+                  BASE="${{ steps.base.outputs.base }}"
+
+                  # Compare using sort -V
+                  HIGHER=$(printf "%s\n%s" "$BASE" "$CURRENT" | sort -V | tail -n1)
+
+                  if [ "$HIGHER" = "$BASE" ]; then
+                    echo "::error::Version in Common/Common.csproj was not increased. Base=$BASE Current=$CURRENT"
+                    exit 1
+                  else
+                    echo "Version OK. Current ($CURRENT) is greater than Base ($BASE)"
+                  fi
