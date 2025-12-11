@@ -20,4 +20,8 @@
     <AssemblyName>Common</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" />
+  </ItemGroup>
+
 </Project>
