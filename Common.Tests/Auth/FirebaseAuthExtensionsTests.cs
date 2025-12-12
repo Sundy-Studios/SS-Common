@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using Common.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace Common.Tests.Auth;
 
