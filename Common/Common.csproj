@@ -10,7 +10,7 @@
     <!-- NuGet package settings -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Common</PackageId>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <Authors>Sundy Studio</Authors>
     <Company>Sundy Studio</Company>
     <Description>A collection of guard clauses and utility methods for safe coding practices.</Description>
@@ -23,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="Moq" />
     <PackageReference Include="MongoDB.Driver" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
   </ItemGroup>
 
 </Project>
