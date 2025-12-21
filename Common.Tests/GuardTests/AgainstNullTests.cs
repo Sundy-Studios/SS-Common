@@ -1,11 +1,10 @@
-using Common.Utility;
-
 namespace Common.Tests.Utility;
+using Common.Utility;
 
 public class AgainstNullTests
 {
     [Fact]
-    public void AgainstNull_WithNonNullValue_ReturnsValue()
+    public void AgainstNullWithNonNullValueReturnsValue()
     {
         var value = "test";
 
@@ -15,7 +14,7 @@ public class AgainstNullTests
     }
 
     [Fact]
-    public void AgainstNull_WithNullValue_ThrowsArgumentNullException()
+    public void AgainstNullWithNullValueThrowsArgumentNullException()
     {
         string? value = null;
 
@@ -24,7 +23,7 @@ public class AgainstNullTests
     }
 
     [Fact]
-    public void AgainstNull_WithNullValueAndNoName_ThrowsWithEmptyName()
+    public void AgainstNullWithNullValueAndNoNameThrowsWithEmptyName()
     {
         string? value = null;
 

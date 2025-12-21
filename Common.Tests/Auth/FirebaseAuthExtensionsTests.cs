@@ -1,13 +1,12 @@
+namespace Common.Tests.Auth;
 using Common.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Common.Tests.Auth;
-
 public class FirebaseAuthExtensionsTests
 {
     [Fact]
-    public void AddFirebaseAuth_RegistersAuthenticationServices()
+    public void AddFirebaseAuthRegistersAuthenticationServices()
     {
         var services = new ServiceCollection();
         var inMemory = new Dictionary<string, string?> { ["Firebase:ProjectId"] = "test-proj" };
