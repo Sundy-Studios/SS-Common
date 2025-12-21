@@ -11,7 +11,25 @@ jobs:
         with:
           dotnet-version: "8.0.x"
       - name: Install dotnet-format
-        run: dotnet tool install -g dotnet-format --version 8.0.453106
+        run: dotnet tool install -g dotnet-format
+
+      - name: Diagnostics, dotnet and git
+        run: |
+          echo "=== dotnet --info ==="
+          dotnet --info
+          echo "=== dotnet-format --version ==="
+          dotnet format --version || true
+          echo "=== dotnet tool list -g ==="
+          dotnet tool list -g || true
+          echo "=== git core.autocrlf ==="
+          git config --get core.autocrlf || true
+          echo "=== git ls-files --eol (first 200 lines) ==="
+          git ls-files --eol | sed -n '1,200p' || true
+      - name: Show files changed by dotnet format
+        run: |
+          dotnet format --verify-no-changes || true
+          git --no-pager diff --name-only || true
+          git status --porcelain || true
       - name: Run dotnet format check
         env:
           PATH: ${{ env.PATH }}:/home/runner/.dotnet/tools
