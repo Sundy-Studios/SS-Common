@@ -1,4 +1,5 @@
 namespace Common.Tests.Auth;
+
 using Common.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

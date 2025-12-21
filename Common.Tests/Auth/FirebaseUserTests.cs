@@ -1,4 +1,5 @@
 namespace Common.Tests.Auth;
+
 using System.Security.Claims;
 using Common.Auth;
 
@@ -7,7 +8,7 @@ public class FirebaseUserTests
     [Fact]
     public void UserIdReturnsClaimValue()
     {
-        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim("user_id", "abc123") }));
+        var principal = new ClaimsPrincipal(new ClaimsIdentity([new Claim("user_id", "abc123")]));
 
         var result = principal.UserId();
 
@@ -27,7 +28,7 @@ public class FirebaseUserTests
     [Fact]
     public void EmailReturnsClaimValue()
     {
-        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Email, "me@example.com") }));
+        var principal = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.Email, "me@example.com")]));
 
         var result = principal.Email();
 

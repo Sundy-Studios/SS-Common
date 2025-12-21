@@ -1,4 +1,5 @@
 namespace Common.Tests.Utility;
+
 using Common.Utility;
 
 public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests

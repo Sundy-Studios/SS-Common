@@ -1,4 +1,5 @@
 namespace Common.Tests.Paging;
+
 using Common.Paging;
 
 public class PagedResultTests
