@@ -6,30 +6,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Pin SDK for CI
+        run: |
+          cat > global.json <<'JSON'
+          {
+            "sdk": {
+              "version": "8.0.100",
+              "rollForward": "disable"
+            }
+          }
+          JSON
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
-      - name: Install dotnet-format
-        run: dotnet tool install -g dotnet-format
+          dotnet-version: "8.0.100"
 
-      - name: Diagnostics, dotnet and git
+      - name: Install dotnet-format pinned
+        run: dotnet tool install -g dotnet-format --version 8.0.453106
+        env:
+          PATH: ${{ env.PATH }}:/home/runner/.dotnet/tools
+
+      - name: Restore, build, then run dotnet format check
+        env:
+          PATH: ${{ env.PATH }}:/home/runner/.dotnet/tools
         run: |
-          echo "=== dotnet --info ==="
           dotnet --info
-          echo "=== dotnet-format --version ==="
-          dotnet format --version || true
-          echo "=== dotnet tool list -g ==="
-          dotnet tool list -g || true
-          echo "=== git core.autocrlf ==="
-          git config --get core.autocrlf || true
-          echo "=== git ls-files --eol (first 200 lines) ==="
-          git ls-files --eol | sed -n '1,200p' || true
-      - name: Show files changed by dotnet format
-        run: |
-          dotnet format --verify-no-changes || true
-          git --no-pager diff --name-only || true
-          git status --porcelain || true
+          dotnet tool list -g
+          dotnet restore
+          dotnet build --no-restore
+          dotnet format --verify-no-changes --verbosity diagnostic
       - name: Run dotnet format check
         env:
           PATH: ${{ env.PATH }}:/home/runner/.dotnet/tools
