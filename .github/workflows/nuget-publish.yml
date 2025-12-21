@@ -10,6 +10,7 @@ on:
       - "Directory.Packages.props"
       - "Directory.Build.props"
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - "**"
     paths:
