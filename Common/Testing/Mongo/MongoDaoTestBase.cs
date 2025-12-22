@@ -1,47 +1,52 @@
+namespace Common.Testing.Mongo;
+
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
-
-namespace Common.Testing.Mongo;
 
 public abstract class MongoDaoTestsBase<TModel, TDao>
     where TModel : class, new()
     where TDao : class
 {
-    protected readonly Mock<IMongoCollection<TModel>> _mockCollection;
-    protected readonly Mock<IMongoIndexManager<TModel>> _mockIndexes;
-    protected readonly Mock<IMongoDatabase> _mockDatabase;
-    protected readonly Mock<ILogger<TDao>> _mockLogger;
-    protected readonly TDao _dao;
+    protected Mock<IMongoCollection<TModel>> MockCollection { get; }
+    protected Mock<IMongoIndexManager<TModel>> MockIndexes { get; }
+    protected Mock<IMongoDatabase> MockDatabase { get; }
+    protected Mock<ILogger<TDao>> MockLogger { get; }
+    protected TDao Dao { get; }
 
-    protected MongoDaoTestsBase(string collectionName, Func<ILogger<TDao>, IMongoDatabase, TDao> daoFactory)
+    protected MongoDaoTestsBase(
+        string collectionName,
+        Func<ILogger<TDao>, IMongoDatabase, TDao> daoFactory)
     {
-        _mockCollection = new Mock<IMongoCollection<TModel>>();
+        MockCollection = new Mock<IMongoCollection<TModel>>();
 
         // Needed so the driver doesn't throw on CollectionNamespace / DocumentSerializer
-        _mockCollection.SetupGet(c => c.CollectionNamespace)
+        MockCollection.SetupGet(c => c.CollectionNamespace)
             .Returns(new CollectionNamespace(new DatabaseNamespace("testDb"), collectionName));
-        _mockCollection.SetupGet(c => c.DocumentSerializer)
+        MockCollection.SetupGet(c => c.DocumentSerializer)
             .Returns(MongoDB.Bson.Serialization.BsonSerializer.SerializerRegistry.GetSerializer<TModel>());
-        _mockCollection.SetupGet(c => c.Settings)
+        MockCollection.SetupGet(c => c.Settings)
             .Returns(new MongoCollectionSettings());
 
         // Mock Indexes
-        _mockIndexes = new Mock<IMongoIndexManager<TModel>>();
-        _mockIndexes
-            .Setup(i => i.CreateOne(It.IsAny<CreateIndexModel<TModel>>(), It.IsAny<CreateOneIndexOptions>(), It.IsAny<CancellationToken>()))
+        MockIndexes = new Mock<IMongoIndexManager<TModel>>();
+        MockIndexes
+            .Setup(i => i.CreateOne(
+                It.IsAny<CreateIndexModel<TModel>>(),
+                It.IsAny<CreateOneIndexOptions>(),
+                It.IsAny<CancellationToken>()))
             .Returns("ok");
-        _mockCollection.SetupGet(c => c.Indexes).Returns(_mockIndexes.Object);
 
-        _mockDatabase = new Mock<IMongoDatabase>();
-        _mockDatabase
+        MockCollection.SetupGet(c => c.Indexes).Returns(MockIndexes.Object);
+
+        MockDatabase = new Mock<IMongoDatabase>();
+        MockDatabase
             .Setup(d => d.GetCollection<TModel>(collectionName, null))
-            .Returns(_mockCollection.Object);
+            .Returns(MockCollection.Object);
 
-        _mockLogger = new Mock<ILogger<TDao>>();
+        MockLogger = new Mock<ILogger<TDao>>();
 
-        // Create DAO instance via factory
-        _dao = daoFactory(_mockLogger.Object, _mockDatabase.Object);
+        Dao = daoFactory(MockLogger.Object, MockDatabase.Object);
     }
 
     protected static Mock<IAsyncCursor<TModel>> CreateMockCursor(List<TModel> models)

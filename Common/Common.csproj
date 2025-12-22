@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -10,7 +10,7 @@
     <!-- NuGet package settings -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>SS.Common</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>Sundy Studio</Authors>
     <Company>Sundy Studio</Company>
     <Description>A collection of guard clauses and utility methods for safe coding practices.</Description>

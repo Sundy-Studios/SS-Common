@@ -1,11 +1,11 @@
-using Common.Paging;
-
 namespace Common.Tests.Paging;
+
+using Common.Paging;
 
 public class PaginationParamsTests
 {
     [Fact]
-    public void Defaults_AreCorrect()
+    public void DefaultsAreCorrect()
     {
         var p = new PaginationParams();
 
@@ -15,7 +15,7 @@ public class PaginationParamsTests
     }
 
     [Fact]
-    public void Setting_PageSize_AboveMax_IsCapped()
+    public void SettingPageSizeAboveMaxIsCapped()
     {
         var p = new PaginationParams { PageSize = 200 };
 
@@ -23,7 +23,7 @@ public class PaginationParamsTests
     }
 
     [Fact]
-    public void Skip_IsCalculated_Correctly()
+    public void SkipIsCalculatedCorrectly()
     {
         var p = new PaginationParams { PageNumber = 3, PageSize = 15 };
 

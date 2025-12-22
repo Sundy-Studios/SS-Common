@@ -1,12 +1,12 @@
-using Common.Utility;
-
 namespace Common.Tests.Utility;
+
+using Common.Utility;
 
 public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
 {
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValues_WithValidStrings_DoesNotThrow()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithValidStringsDoesNotThrow()
     {
         var strings = new List<string> { "value1", "value2", "value3" };
 
@@ -15,7 +15,7 @@ public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValues_WithNullCollection_ThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithNullCollectionThrowsArgumentException()
     {
         List<string>? strings = null;
 
@@ -26,7 +26,7 @@ public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValues_WithEmptyCollection_ThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithEmptyCollectionThrowsArgumentException()
     {
         var strings = new List<string>();
 
@@ -37,7 +37,7 @@ public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValues_WithNullString_ThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithNullStringThrowsArgumentException()
     {
         var strings = new List<string?> { "value1", null, "value2" };
 
@@ -48,7 +48,7 @@ public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValues_WithEmptyString_ThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithEmptyStringThrowsArgumentException()
     {
         var strings = new List<string> { "value1", "", "value2" };
 
@@ -59,7 +59,7 @@ public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValues_WithWhitespaceString_ThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithWhitespaceStringThrowsArgumentException()
     {
         var strings = new List<string> { "value1", "   ", "value2" };
 
@@ -70,7 +70,7 @@ public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValues_WithTabString_ThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithTabStringThrowsArgumentException()
     {
         var strings = new List<string> { "value1", "\t", "value2" };
 
@@ -81,7 +81,7 @@ public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
     }
 
     [Fact]
-    public void AgainstNull_WithComplexObject_ReturnsObject()
+    public void AgainstNullWithComplexObjectReturnsObject()
     {
         var obj = new { Name = "Test", Value = 42 };
 

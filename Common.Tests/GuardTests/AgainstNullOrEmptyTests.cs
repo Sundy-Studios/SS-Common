@@ -1,12 +1,12 @@
-using Common.Utility;
-
 namespace Common.Tests.Utility;
+
+using Common.Utility;
 
 public class AgainstNullOrEmptyTests
 {
 
     [Fact]
-    public void AgainstNullOrEmpty_WithValidEnumerable_DoesNotThrow()
+    public void AgainstNullOrEmptyWithValidEnumerableDoesNotThrow()
     {
         var items = new List<int> { 1, 2, 3 };
 
@@ -15,7 +15,7 @@ public class AgainstNullOrEmptyTests
     }
 
     [Fact]
-    public void AgainstNullOrEmpty_WithNullEnumerable_ThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullEnumerableThrowsArgumentException()
     {
         List<int>? items = null;
 
@@ -25,7 +25,7 @@ public class AgainstNullOrEmptyTests
     }
 
     [Fact]
-    public void AgainstNullOrEmpty_WithEmptyEnumerable_ThrowsArgumentException()
+    public void AgainstNullOrEmptyWithEmptyEnumerableThrowsArgumentException()
     {
         var items = new List<int>();
 
