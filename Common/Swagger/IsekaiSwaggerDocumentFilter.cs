@@ -1,49 +1,61 @@
-namespace Common.Swagger;
-
 using System.Reflection;
 using Common.Attributes.Isekai;
 using Common.Services.Isekai;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-public class IsekaiSwaggerDocumentFilter(Assembly clientAssembly) : IDocumentFilter
+namespace Common.Swagger
 {
-    private readonly Assembly _clientAssembly = clientAssembly;
-
-    public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
+    public class IsekaiSwaggerDocumentFilter : IDocumentFilter
     {
-        // Find all interfaces implementing IIsekaiService
-        var isekaiTypes = _clientAssembly
-            .GetTypes()
-            .Where(t => t.IsInterface && typeof(IIsekaiService).IsAssignableFrom(t) && t != typeof(IIsekaiService));
+        private readonly Assembly _clientAssembly;
 
-        foreach (var type in isekaiTypes)
+        public IsekaiSwaggerDocumentFilter(Assembly clientAssembly)
         {
-            foreach (var method in type.GetMethods())
+            _clientAssembly = clientAssembly;
+        }
+
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
+        {
+            var isekaiTypes = _clientAssembly
+                .GetTypes()
+                .Where(t => t.IsInterface && typeof(IIsekaiService).IsAssignableFrom(t) && t != typeof(IIsekaiService));
+
+            foreach (var type in isekaiTypes)
             {
-                var pathAttr = method.GetCustomAttribute<IsekaiPathAttribute>();
-                if (pathAttr == null)
+                foreach (var method in type.GetMethods())
                 {
-                    continue;
-                }
+                    var pathAttr = method.GetCustomAttribute<IsekaiPathAttribute>();
+                    if (pathAttr == null)
+                        continue;
 
-                var path = pathAttr.Path.StartsWith("/") ? pathAttr.Path : "/" + pathAttr.Path;
+                    var path = pathAttr.Path.StartsWith('/') 
+                        ? pathAttr.Path 
+                        : "/" + pathAttr.Path;
 
-                // Only add GET endpoints here; can extend to support POST/PUT/etc.
-                swaggerDoc.Paths[path] = new OpenApiPathItem
-                {
-                    Operations =
+                    // Map your enum to Swagger OperationType
+                    var operationType = pathAttr.Method switch
                     {
-                        [OperationType.Get] = new OpenApiOperation
+                        IsekaiHttpMethod.Get => OperationType.Get,
+                        IsekaiHttpMethod.Post => OperationType.Post,
+                        IsekaiHttpMethod.Put => OperationType.Put,
+                        IsekaiHttpMethod.Delete => OperationType.Delete,
+                        IsekaiHttpMethod.Patch => OperationType.Patch,
+                        _ => OperationType.Get
+                    };
+
+                    if (!swaggerDoc.Paths.ContainsKey(path))
+                        swaggerDoc.Paths[path] = new OpenApiPathItem();
+
+                    swaggerDoc.Paths[path].Operations[operationType] = new OpenApiOperation
+                    {
+                        Summary = $"Isekai: {type.Name}.{method.Name}",
+                        Responses =
                         {
-                            Summary = $"Isekai: {type.Name}.{method.Name}",
-                            Responses =
-                            {
-                                ["200"] = new OpenApiResponse { Description = "Success" }
-                            }
+                            ["200"] = new OpenApiResponse { Description = "Success" }
                         }
-                    }
-                };
+                    };
+                }
             }
         }
     }
