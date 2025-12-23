@@ -1,3 +1,5 @@
+namespace Common.Swagger;
+
 using System.Reflection;
 using Common.Attributes.Isekai;
 using Common.Services.Isekai;
