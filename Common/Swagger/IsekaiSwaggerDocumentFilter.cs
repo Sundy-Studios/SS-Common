@@ -27,7 +27,7 @@ public class IsekaiSwaggerDocumentFilter(Assembly clientAssembly) : IDocumentFil
                     continue;
                 }
 
-                var path = pathAttr.Path.StartsWith('/') ? pathAttr.Path : "/" + pathAttr.Path;
+                var path = pathAttr.Path.StartsWith("/") ? pathAttr.Path : "/" + pathAttr.Path;
 
                 // Only add GET endpoints here; can extend to support POST/PUT/etc.
                 swaggerDoc.Paths[path] = new OpenApiPathItem

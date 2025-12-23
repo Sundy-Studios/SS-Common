@@ -4,5 +4,5 @@ namespace Common.Attributes.Isekai;
 public sealed class IsekaiGateAttribute(string clientName, string serviceName) : Attribute
 {
     public string ClientName { get; } = clientName;
-    public string ServiceName { get; } = serviceName; 
+    public string ServiceName { get; } = serviceName;
 }
