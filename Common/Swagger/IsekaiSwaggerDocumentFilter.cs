@@ -6,15 +6,13 @@ using Common.Services.Isekai;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-public class IsekaiSwaggerDocumentFilter(Assembly clientAssembly) : IDocumentFilter
+public class IsekaiSwaggerDocumentFilter : IDocumentFilter
 {
-    private readonly Assembly _clientAssembly = clientAssembly;
-
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
         // Find all interfaces implementing IIsekaiService
-        var isekaiTypes = _clientAssembly
-            .GetTypes()
+        var isekaiTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes())
             .Where(t => t.IsInterface && typeof(IIsekaiService).IsAssignableFrom(t) && t != typeof(IIsekaiService));
 
         foreach (var type in isekaiTypes)
