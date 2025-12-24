@@ -1,4 +1,4 @@
-namespace TemplateMongo.Startup;
+namespace Common.Startup;
 
 using System.Reflection;
 using Common.Attributes.Isekai;
