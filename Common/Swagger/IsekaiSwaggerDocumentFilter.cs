@@ -79,14 +79,29 @@ public class IsekaiSwaggerDocumentFilter(Assembly clientAssembly) : IDocumentFil
                             Required = true
                         };
                     }
+                    else if (fromQuery && param.ParameterType.IsClass && param.ParameterType != typeof(string))
+                    {
+                        // Flatten each property of the query object into its own parameter
+                        foreach (var prop in param.ParameterType.GetProperties())
+                        {
+                            operation.Parameters.Add(new OpenApiParameter
+                            {
+                                Name = prop.Name,
+                                In = ParameterLocation.Query,
+                                Required = false, // mark as optional unless you add custom attribute
+                                Schema = context.SchemaGenerator.GenerateSchema(prop.PropertyType, context.SchemaRepository)
+                            });
+                        }
+                    }
                     else
                     {
+                        // primitive or simple query/route param
                         var openApiParam = new OpenApiParameter
                         {
                             Name = name,
                             In = fromQuery ? ParameterLocation.Query :
-                                 fromRoute ? ParameterLocation.Path :
-                                 ParameterLocation.Query, // default to query
+                                fromRoute ? ParameterLocation.Path :
+                                ParameterLocation.Query, // default to query
                             Required = fromRoute, // path params are required
                             Schema = context.SchemaGenerator.GenerateSchema(param.ParameterType, context.SchemaRepository)
                         };
@@ -94,6 +109,7 @@ public class IsekaiSwaggerDocumentFilter(Assembly clientAssembly) : IDocumentFil
                         operation.Parameters.Add(openApiParam);
                     }
                 }
+
 
                 pathItem.Operations[httpMethod] = operation;
             }
