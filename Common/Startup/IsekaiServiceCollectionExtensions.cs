@@ -14,11 +14,16 @@ public static class IsekaiServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddIsekai(this IServiceCollection services, Assembly? assembly = null)
     {
-        assembly ??= Assembly.GetCallingAssembly();
+        var assemblies = assembly != null
+            ? [assembly]
+            : AppDomain.CurrentDomain.GetAssemblies();
 
-        // Find all IIsekaiService interfaces
-        var serviceInterfaces = assembly.GetTypes()
-            .Where(t => t.IsInterface && typeof(IIsekaiService).IsAssignableFrom(t) && t != typeof(IIsekaiService));
+        var serviceInterfaces = assemblies
+            .SelectMany(a => a.GetTypes())
+            .Where(t =>
+                t.IsInterface &&
+                typeof(IIsekaiService).IsAssignableFrom(t) &&
+                t != typeof(IIsekaiService));
 
         foreach (var iface in serviceInterfaces)
         {
@@ -37,9 +42,16 @@ public static class IsekaiServiceCollectionExtensions
     /// </summary>
     public static WebApplication MapIsekaiEndpoints(this WebApplication app, Assembly? assembly = null)
     {
-        assembly ??= Assembly.GetCallingAssembly();
-        var serviceInterfaces = assembly.GetTypes()
-            .Where(t => t.IsInterface && typeof(IIsekaiService).IsAssignableFrom(t) && t != typeof(IIsekaiService));
+        var assemblies = assembly != null
+            ? [assembly]
+            : AppDomain.CurrentDomain.GetAssemblies();
+
+        var serviceInterfaces = assemblies
+            .SelectMany(a => a.GetTypes())
+            .Where(t =>
+                t.IsInterface &&
+                typeof(IIsekaiService).IsAssignableFrom(t) &&
+                t != typeof(IIsekaiService));
 
         foreach (var iface in serviceInterfaces)
         {
