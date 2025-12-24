@@ -18,8 +18,9 @@ public static class IsekaiServiceCollectionExtensions
             ? [assembly]
             : AppDomain.CurrentDomain.GetAssemblies();
 
-        var serviceInterfaces = assemblies
-            .SelectMany(a => a.GetTypes())
+        var allTypes = assemblies.SelectMany(GetLoadableTypes);
+
+        var serviceInterfaces = allTypes
             .Where(t =>
                 t.IsInterface &&
                 typeof(IIsekaiService).IsAssignableFrom(t) &&
@@ -28,8 +29,11 @@ public static class IsekaiServiceCollectionExtensions
         foreach (var iface in serviceInterfaces)
         {
             // Find a concrete class implementing this interface
-            var impl = assembly.GetTypes()
-                .FirstOrDefault(t => iface.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract) ?? throw new InvalidOperationException($"No implementation found for {iface.FullName}");
+            var impl = allTypes.FirstOrDefault(t =>
+                iface.IsAssignableFrom(t) &&
+                t.IsClass &&
+                !t.IsAbstract)
+                ?? throw new InvalidOperationException($"No implementation found for {iface.FullName}");
 
             services.AddScoped(iface, impl);
         }
@@ -46,8 +50,9 @@ public static class IsekaiServiceCollectionExtensions
             ? [assembly]
             : AppDomain.CurrentDomain.GetAssemblies();
 
-        var serviceInterfaces = assemblies
-            .SelectMany(a => a.GetTypes())
+        var allTypes = assemblies.SelectMany(GetLoadableTypes);
+
+        var serviceInterfaces = allTypes
             .Where(t =>
                 t.IsInterface &&
                 typeof(IIsekaiService).IsAssignableFrom(t) &&
@@ -55,8 +60,10 @@ public static class IsekaiServiceCollectionExtensions
 
         foreach (var iface in serviceInterfaces)
         {
-            var impl = assembly.GetTypes()
-                .FirstOrDefault(t => iface.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract);
+            var impl = allTypes.FirstOrDefault(t =>
+                iface.IsAssignableFrom(t) &&
+                t.IsClass &&
+                !t.IsAbstract);
 
             if (impl == null)
             {
@@ -126,6 +133,18 @@ public static class IsekaiServiceCollectionExtensions
         //     return;
 
         // builder.RequireAuthorization(authorizeAttributes);
+    }
+
+    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            return ex.Types.Where(t => t != null)!;
+        }
     }
 
     private static async Task<object?[]> BindParameters(
