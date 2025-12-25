@@ -1,4 +1,4 @@
-namespace Common.Attributes.Isekai;
+namespace Common.Isekai.Attributes;
 
 [AttributeUsage(AttributeTargets.Interface, Inherited = false)]
 public sealed class IsekaiGateAttribute(string clientName, string serviceName) : Attribute

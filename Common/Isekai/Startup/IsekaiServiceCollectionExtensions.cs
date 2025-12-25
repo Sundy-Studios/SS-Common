@@ -1,8 +1,9 @@
-namespace Common.Startup;
+namespace Common.Isekai.Startup;
 
 using System.Reflection;
-using Common.Attributes.Isekai;
-using Common.Services.Isekai;
+using Common.Isekai.Attributes;
+using Common.Isekai.Client;
+using Common.Isekai.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -110,6 +111,16 @@ public static class IsekaiServiceCollectionExtensions
         }
 
         return app;
+    }
+
+    public static IServiceCollection AddIsekaiClient<T>(this IServiceCollection services, HttpClient httpClient)
+        where T : class, IIsekaiService   // <-- Add this constraint
+    {
+        services.AddSingleton(sp =>
+            // Pass the HttpClient instance to the proxy factory
+            IsekaiClient.Create<T>(httpClient));
+
+        return services;
     }
 
     private static void ApplyAuthorization(

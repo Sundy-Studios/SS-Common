@@ -1,4 +1,4 @@
-namespace Common.Attributes.Isekai;
+namespace Common.Isekai.Attributes;
 
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class IsekaiMethodTimeoutAttribute(IsekaiMethodTimeout timeout) : Attribute

@@ -1,4 +1,4 @@
-namespace Common.Attributes.Isekai;
+namespace Common.Isekai.Attributes;
 
 public enum IsekaiMethodTimeout
 {
