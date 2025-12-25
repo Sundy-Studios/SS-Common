@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Common.Isekai.Attributes;
 
-internal sealed class IsekaiClientProxy : DispatchProxy
+internal class IsekaiClientProxy : DispatchProxy
 {
     private HttpClient _httpClient = null!;
 
