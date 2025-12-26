@@ -9,6 +9,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Common.Isekai.Attributes;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Performance",
+    "CA1852:Seal internal types",
+    Justification = "DispatchProxy requires non sealed base type"
+)]
 internal class IsekaiClientProxy : DispatchProxy
 {
     private HttpClient _httpClient = null!;
@@ -33,7 +38,7 @@ internal class IsekaiClientProxy : DispatchProxy
 
             // Create Task<T> from Task<object?>
             var castMethod = typeof(IsekaiClientProxy)
-                .GetMethod(nameof(CastTask), BindingFlags.NonPublic | BindingFlags.Instance)!
+                .GetMethod(nameof(CastTask), BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)!
                 .MakeGenericMethod(resultType);
 
             return castMethod.Invoke(this, [task])!;
