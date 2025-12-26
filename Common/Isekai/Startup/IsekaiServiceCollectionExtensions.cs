@@ -284,13 +284,22 @@ public static class IsekaiServiceCollectionExtensions
                 statusCode: (int)ex.StatusCode
             );
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            // You can choose to include the exception message in details
+            var details = new List<string> { ex.Message };
+
+            // Optionally include the stack trace in development environments
+            #if DEBUG
+            details.Add(ex.StackTrace ?? string.Empty);
+            #endif
+
             return Results.Json(
                 new ErrorResponse(
-                    false,
-                    StatusCodes.Status500InternalServerError,
-                    "Internal server error"
+                    success: false,
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    message: "Internal server error",
+                    details: details
                 ),
                 statusCode: StatusCodes.Status500InternalServerError
             );
