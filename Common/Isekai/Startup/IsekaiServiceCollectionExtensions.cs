@@ -4,6 +4,7 @@ using System.Reflection;
 using Common.Isekai.Attributes;
 using Common.Isekai.Client;
 using Common.Isekai.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -128,23 +129,46 @@ public static class IsekaiServiceCollectionExtensions
         Type iface,
         MethodInfo method)
     {
-        // // AllowAnonymous always wins
-        // if (method.IsDefined(typeof(AllowAnonymousAttribute), true))
-        // {
-        //     builder.AllowAnonymous();
-        //     return;
-        // }
+        // AllowAnonymous always wins
+        if (method.IsDefined(typeof(IsekaiAllowAnonymousAttribute), inherit: true) ||
+            iface.IsDefined(typeof(IsekaiAllowAnonymousAttribute), inherit: true))
+        {
+            builder.AllowAnonymous();
+            return;
+        }
 
-        // var authorizeAttributes =
-        //     iface.GetCustomAttributes<AuthorizeAttribute>(true)
-        //          .Concat(method.GetCustomAttributes<AuthorizeAttribute>(true))
-        //          .ToArray();
+        var authorizeAttributes =
+            iface.GetCustomAttributes<IsekaiAuthorizeAttribute>(true)
+                .Concat(method.GetCustomAttributes<IsekaiAuthorizeAttribute>(true))
+                .ToArray();
 
-        // if (authorizeAttributes.Length == 0)
-        //     return;
+        if (authorizeAttributes.Length == 0)
+        {
+            return;
+        }
 
-        // builder.RequireAuthorization(authorizeAttributes);
+        foreach (var attr in authorizeAttributes)
+        {
+            var policy = new AuthorizationPolicyBuilder();
+
+            policy.RequireAuthenticatedUser();
+
+            if (!string.IsNullOrWhiteSpace(attr.Policy))
+            {
+                policy.RequireClaim("policy", attr.Policy);
+            }
+
+            if (!string.IsNullOrWhiteSpace(attr.Roles))
+            {
+                policy.RequireRole(
+                    attr.Roles
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            }
+
+            builder.RequireAuthorization(policy.Build());
+        }
     }
+
 
     private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
     {
