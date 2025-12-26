@@ -1,6 +1,12 @@
 namespace Common.Isekai.Startup;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using Common.Exception.Contracts;
+using Common.Exception.Models;
 using Common.Isekai.Attributes;
 using Common.Isekai.Client;
 using Common.Isekai.Services;
@@ -35,7 +41,7 @@ public static class IsekaiServiceCollectionExtensions
                 iface.IsAssignableFrom(t) &&
                 t.IsClass &&
                 !t.IsAbstract)
-                ?? throw new InvalidOperationException($"No implementation found for {iface.FullName}");
+                ?? throw new ConflictException($"No implementation found for {iface.FullName}");
 
             services.AddScoped(iface, impl);
         }
@@ -266,18 +272,28 @@ public static class IsekaiServiceCollectionExtensions
             // Synchronous method
             return result == null ? Results.NoContent() : Results.Ok(result);
         }
-        catch (ArgumentException ex)
+        catch (CommonHttpException ex)
         {
-            return Results.BadRequest(new { error = ex.Message });
+            return Results.Json(
+                new ErrorResponse(
+                    false,
+                    (int)ex.StatusCode,
+                    ex.Message ?? ex.StatusCode.ToString(),
+                    ex.Details
+                ),
+                statusCode: (int)ex.StatusCode
+            );
         }
-        catch (InvalidOperationException ex)
+        catch (Exception)
         {
-            return Results.Conflict(new { error = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            // fallback for unhandled exceptions
-            return Results.Problem(ex.Message);
+            return Results.Json(
+                new ErrorResponse(
+                    false,
+                    StatusCodes.Status500InternalServerError,
+                    "Internal server error"
+                ),
+                statusCode: StatusCodes.Status500InternalServerError
+            );
         }
     }
 

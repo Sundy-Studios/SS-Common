@@ -7,6 +7,7 @@ using System.Net.Http.Json;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Common.Exception.Models;
 using Common.Isekai.Attributes;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
@@ -57,7 +58,7 @@ internal class IsekaiClientProxy : DispatchProxy
     private async Task<object?> InvokeAsync(MethodInfo method, object?[] args)
     {
         var pathAttr = method.GetCustomAttribute<IsekaiPathAttribute>()
-                       ?? throw new InvalidOperationException($"{method.Name} missing IsekaiPathAttribute");
+                       ?? throw new ConflictException($"{method.Name} missing IsekaiPathAttribute");
 
         var path = pathAttr.Path;
 
