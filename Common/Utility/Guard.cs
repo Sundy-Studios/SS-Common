@@ -1,5 +1,10 @@
 namespace Common.Utility;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Common.Exception.Models;
+
 public static class Guard
 {
     public static T AgainstNull<T>(T parameter, string? name = null) where T : class => parameter ?? throw new ArgumentNullException(name ?? "", $"guarded argument '{name ?? ""}' was null");
@@ -8,7 +13,7 @@ public static class Guard
     {
         if (enumerable == null || !enumerable.Any())
         {
-            throw new ArgumentException($"expected at least one element in '{name ?? ""}' but it was null or empty");
+            throw new BadRequestException($"expected at least one element in '{name ?? ""}' but it was null or empty");
         }
     }
 
@@ -16,12 +21,12 @@ public static class Guard
     {
         if (strings == null || !strings.Any())
         {
-            throw new ArgumentException($"expected at least one element in '{name ?? ""}' but it was null or empty");
+            throw new BadRequestException($"expected at least one element in '{name ?? ""}' but it was null or empty");
         }
 
         if (strings.Any(string.IsNullOrWhiteSpace))
         {
-            throw new ArgumentException($"'{name ?? ""}' contains null or whitespace values");
+            throw new BadRequestException($"'{name ?? ""}' contains null or whitespace values");
         }
     }
 
@@ -29,7 +34,7 @@ public static class Guard
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException("Cannot be null, empty, or whitespace.", paramName);
+            throw new BadRequestException($"Parameter '{paramName}' cannot be null, empty, or whitespace.");
         }
     }
 

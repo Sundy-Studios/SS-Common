@@ -1,5 +1,6 @@
 namespace Common.Tests.Utility;
 
+using Common.Exception.Models;
 using Common.Utility;
 
 public class AgainstNullOrEmptyTests
@@ -15,21 +16,21 @@ public class AgainstNullOrEmptyTests
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullEnumerableThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullEnumerableThrowsBadRequestException()
     {
         List<int>? items = null;
 
-        var exception = Assert.Throws<ArgumentException>(() => Guard.AgainstNullOrEmpty(items!, "items"));
+        var exception = Assert.Throws<BadRequestException>(() => Guard.AgainstNullOrEmpty(items!, "items"));
         Assert.Contains("items", exception.Message);
         Assert.Contains("null or empty", exception.Message);
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithEmptyEnumerableThrowsArgumentException()
+    public void AgainstNullOrEmptyWithEmptyEnumerableThrowsBadRequestException()
     {
         var items = new List<int>();
 
-        var exception = Assert.Throws<ArgumentException>(() => Guard.AgainstNullOrEmpty(items, "items"));
+        var exception = Assert.Throws<BadRequestException>(() => Guard.AgainstNullOrEmpty(items, "items"));
         Assert.Contains("items", exception.Message);
         Assert.Contains("null or empty", exception.Message);
     }

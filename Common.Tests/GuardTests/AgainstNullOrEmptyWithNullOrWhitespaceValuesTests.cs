@@ -1,5 +1,6 @@
 namespace Common.Tests.Utility;
 
+using Common.Exception.Models;
 using Common.Utility;
 
 public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
@@ -15,66 +16,66 @@ public class AgainstNullOrEmptyWithNullOrWhitespaceValuesTests
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithNullCollectionThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithNullCollectionThrowsBadRequestException()
     {
         List<string>? strings = null;
 
-        var exception = Assert.Throws<ArgumentException>(() =>
+        var exception = Assert.Throws<BadRequestException>(() =>
             Guard.AgainstNullOrEmptyWithNullOrWhitespaceValues(strings!, "strings"));
         Assert.Contains("strings", exception.Message);
         Assert.Contains("null or empty", exception.Message);
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithEmptyCollectionThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithEmptyCollectionThrowsBadRequestException()
     {
         var strings = new List<string>();
 
-        var exception = Assert.Throws<ArgumentException>(() =>
+        var exception = Assert.Throws<BadRequestException>(() =>
             Guard.AgainstNullOrEmptyWithNullOrWhitespaceValues(strings, "strings"));
         Assert.Contains("strings", exception.Message);
         Assert.Contains("null or empty", exception.Message);
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithNullStringThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithNullStringThrowsBadRequestException()
     {
         var strings = new List<string?> { "value1", null, "value2" };
 
-        var exception = Assert.Throws<ArgumentException>(() =>
+        var exception = Assert.Throws<BadRequestException>(() =>
             Guard.AgainstNullOrEmptyWithNullOrWhitespaceValues(strings!, "strings"));
         Assert.Contains("strings", exception.Message);
         Assert.Contains("null or whitespace", exception.Message);
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithEmptyStringThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithEmptyStringThrowsBadRequestException()
     {
         var strings = new List<string> { "value1", "", "value2" };
 
-        var exception = Assert.Throws<ArgumentException>(() =>
+        var exception = Assert.Throws<BadRequestException>(() =>
             Guard.AgainstNullOrEmptyWithNullOrWhitespaceValues(strings, "strings"));
         Assert.Contains("strings", exception.Message);
         Assert.Contains("null or whitespace", exception.Message);
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithWhitespaceStringThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithWhitespaceStringThrowsBadRequestException()
     {
         var strings = new List<string> { "value1", "   ", "value2" };
 
-        var exception = Assert.Throws<ArgumentException>(() =>
+        var exception = Assert.Throws<BadRequestException>(() =>
             Guard.AgainstNullOrEmptyWithNullOrWhitespaceValues(strings, "strings"));
         Assert.Contains("strings", exception.Message);
         Assert.Contains("null or whitespace", exception.Message);
     }
 
     [Fact]
-    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithTabStringThrowsArgumentException()
+    public void AgainstNullOrEmptyWithNullOrWhitespaceValuesWithTabStringThrowsBadRequestException()
     {
         var strings = new List<string> { "value1", "\t", "value2" };
 
-        var exception = Assert.Throws<ArgumentException>(() =>
+        var exception = Assert.Throws<BadRequestException>(() =>
             Guard.AgainstNullOrEmptyWithNullOrWhitespaceValues(strings, "strings"));
         Assert.Contains("strings", exception.Message);
         Assert.Contains("null or whitespace", exception.Message);
