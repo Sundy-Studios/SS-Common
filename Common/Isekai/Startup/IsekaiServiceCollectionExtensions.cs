@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
+using System.Text.Json;
 
 /// <summary>
 /// Provides extension methods for registering and mapping IIsekaiService implementations
@@ -22,14 +24,12 @@ using Microsoft.Extensions.DependencyInjection;
 public static class IsekaiServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers all IIsekaiService implementations found in the provided assembly or loaded assemblies.
+    /// Registers all IIsekaiService implementations found in the provided assembly or loaded assemblies,
+    /// and adds automatic exception handling for unhandled exceptions (401/403 etc.).
     /// </summary>
     public static IServiceCollection AddIsekai(this IServiceCollection services, Assembly? assembly = null)
     {
-        var assemblies = assembly != null
-            ? [assembly]
-            : AppDomain.CurrentDomain.GetAssemblies();
-
+        var assemblies = assembly != null ? [assembly] : AppDomain.CurrentDomain.GetAssemblies();
         var allTypes = assemblies.SelectMany(GetLoadableTypes);
 
         var serviceInterfaces = allTypes
@@ -43,6 +43,9 @@ public static class IsekaiServiceCollectionExtensions
             services.AddScoped(iface, impl);
         }
 
+        // automatically inject global exception handling via startup filter
+        services.AddSingleton<IStartupFilter, IsekaiExceptionStartupFilter>();
+
         return services;
     }
 
@@ -51,10 +54,7 @@ public static class IsekaiServiceCollectionExtensions
     /// </summary>
     public static WebApplication MapIsekaiEndpoints(this WebApplication app, Assembly? assembly = null)
     {
-        var assemblies = assembly != null
-            ? [assembly]
-            : AppDomain.CurrentDomain.GetAssemblies();
-
+        var assemblies = assembly != null ? [assembly] : AppDomain.CurrentDomain.GetAssemblies();
         var allTypes = assemblies.SelectMany(GetLoadableTypes);
 
         var serviceInterfaces = allTypes
@@ -110,41 +110,6 @@ public static class IsekaiServiceCollectionExtensions
     {
         services.AddSingleton(sp => IsekaiClient.Create<T>(httpClient));
         return services;
-    }
-
-    /// <summary>
-    /// Middleware for automatically transforming 401/403 responses into ErrorResponse format.
-    /// Call after UseAuthentication and UseAuthorization.
-    /// </summary>
-    public static IApplicationBuilder UseIsekaiErrorResponses(this IApplicationBuilder app)
-    {
-        app.Use(async (ctx, next) =>
-        {
-            await next();
-
-            if (ctx.Response.HasStarted)
-            {
-                return;
-            }
-
-            if (ctx.Response.StatusCode is StatusCodes.Status401Unauthorized or
-                StatusCodes.Status403Forbidden)
-            {
-                var message = ctx.Response.StatusCode == 401 ? "Unauthorized" : "Forbidden";
-
-                ctx.Response.ContentType = "application/json";
-
-                var error = new ErrorResponse(
-                    Success: false,
-                    StatusCode: ctx.Response.StatusCode,
-                    Message: message
-                );
-
-                await ctx.Response.WriteAsJsonAsync(error);
-            }
-        });
-
-        return app;
     }
 
     #region Private helpers
@@ -277,16 +242,105 @@ public static class IsekaiServiceCollectionExtensions
         }
         catch (Exception ex)
         {
-            var details = new List<string> { ex.Message };
-#if DEBUG
-            details.Add(ex.StackTrace ?? string.Empty);
-#endif
-            return Results.Json(
-                new ErrorResponse(false, StatusCodes.Status500InternalServerError, "Internal server error", details),
-                statusCode: StatusCodes.Status500InternalServerError
-            );
+            throw; // let global exception handler in startup filter catch it
         }
     }
 
     #endregion
+}
+
+/// <summary>
+/// Startup filter that injects centralized error handling into the pipeline.
+/// </summary>
+internal sealed class IsekaiExceptionStartupFilter : IStartupFilter
+{
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+    {
+        app.Use(async (ctx, nextMiddleware) =>
+        {
+            Exception? exception = null;
+
+            try
+            {
+                await nextMiddleware();
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+            if (ctx.Response.HasStarted)
+            {
+                return;
+            }
+
+            var statusCode = exception switch
+            {
+                UnauthorizedException => StatusCodes.Status401Unauthorized,
+                ForbiddenException => StatusCodes.Status403Forbidden,
+                NotFoundException => StatusCodes.Status404NotFound,
+                _ when exception != null => StatusCodes.Status500InternalServerError,
+                _ => ctx.Response.StatusCode
+            };
+
+            if (statusCode < StatusCodes.Status400BadRequest)
+            {
+                return;
+            }
+
+            var message = ResolveMessage(statusCode, exception);
+
+            await WriteError(ctx, statusCode, message, exception);
+        });
+
+        next(app);
+    };
+
+    private static string ResolveMessage(int statusCode, Exception? ex)
+    {
+        if (!string.IsNullOrWhiteSpace(ex?.Message))
+        {
+            return ex.Message;
+        }
+
+        return statusCode switch
+        {
+            StatusCodes.Status400BadRequest => "Bad request",
+            StatusCodes.Status401Unauthorized => "Unauthorized",
+            StatusCodes.Status403Forbidden => "Forbidden",
+            StatusCodes.Status404NotFound => "Not found",
+            StatusCodes.Status405MethodNotAllowed => "Method not allowed",
+            StatusCodes.Status409Conflict => "Conflict",
+            StatusCodes.Status422UnprocessableEntity => "Unprocessable entity",
+            _ => "An unexpected error occurred"
+        };
+    }
+
+    private static Task WriteError(
+        HttpContext ctx,
+        int statusCode,
+        string message,
+        Exception? ex)
+    {
+        ctx.Response.Clear();
+        ctx.Response.StatusCode = statusCode;
+        ctx.Response.ContentType = "application/json";
+
+        List<string>? details = null;
+
+#if DEBUG
+        if (ex?.StackTrace != null)
+        {
+            details = new List<string> { ex.StackTrace };
+        }
+#endif
+
+        var error = new ErrorResponse(
+            Success: false,
+            StatusCode: statusCode,
+            Message: message,
+            Details: details);
+
+        return ctx.Response.WriteAsJsonAsync(error);
+    }
 }
