@@ -2,6 +2,7 @@ namespace Common.Isekai.Startup;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -76,7 +77,7 @@ public static class IsekaiEndpointMapper
 
                 if (type.IsPrimitive || type == typeof(string))
                 {
-                    values.Add(Convert.ChangeType(ctx.Request.Query[p.Name!], type));
+                    values.Add(Convert.ChangeType(ctx.Request.Query[p.Name!].ToString(), type, CultureInfo.InvariantCulture));
                     continue;
                 }
 
@@ -85,7 +86,7 @@ public static class IsekaiEndpointMapper
                 {
                     if (ctx.Request.Query.TryGetValue(prop.Name, out var value))
                     {
-                        prop.SetValue(obj, Convert.ChangeType(value.ToString(), prop.PropertyType));
+                        prop.SetValue(obj, Convert.ChangeType(value.ToString(), prop.PropertyType, CultureInfo.InvariantCulture));
                     }
                 }
 

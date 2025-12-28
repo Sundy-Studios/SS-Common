@@ -1,5 +1,6 @@
 namespace Common.Isekai.Swagger;
 
+using System.Globalization;
 using System.Reflection;
 using Common.Isekai.Attributes;
 using Common.Isekai.Services;
@@ -108,7 +109,7 @@ public class IsekaiSwaggerDocumentFilter : IDocumentFilter
     {
         foreach (var response in responses)
         {
-            operation.Responses[response.StatusCode.ToString()] =
+            operation.Responses[response.StatusCode.ToString(CultureInfo.InvariantCulture)] =
                 new OpenApiResponse
                 {
                     Description = response.Description,
@@ -267,7 +268,7 @@ public class IsekaiSwaggerDocumentFilter : IDocumentFilter
     // -------------------------
 
     private static string NormalizePath(string path) =>
-        path.StartsWith("/") ? path : "/" + path;
+        path.Length > 0 && path[0] == '/' ? path : "/" + path;
 
     private static OperationType MapHttpMethod(IsekaiHttpMethod method) =>
         method switch
