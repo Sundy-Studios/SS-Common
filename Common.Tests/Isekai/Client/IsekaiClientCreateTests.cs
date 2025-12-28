@@ -9,13 +9,13 @@ public class IsekaiClientCreateTests
     public interface ITestService : IIsekaiService { }
 
     [Fact]
-    public void Create_ReturnsProxyForInterface()
+    public void CreateReturnsProxyForInterface()
     {
-        var http = new HttpClient { BaseAddress = new System.Uri("http://localhost") };
+        var http = new HttpClient { BaseAddress = new Uri("http://localhost") };
 
         var svc = IsekaiClient.Create<ITestService>(http);
 
         Assert.NotNull(svc);
-        Assert.IsAssignableFrom<ITestService>(svc);
+        Assert.IsType<ITestService>(svc, exactMatch: false);
     }
 }

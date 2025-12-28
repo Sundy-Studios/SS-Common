@@ -6,7 +6,7 @@ using Common.Exception.Models;
 public class ConflictExceptionTests
 {
     [Fact]
-    public void Default_ConstructsWithConflict()
+    public void DefaultConstructsWithConflict()
     {
         var ex = new ConflictException();
 

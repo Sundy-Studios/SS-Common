@@ -6,7 +6,7 @@ using Common.Exception.Models;
 public class BadRequestExceptionTests
 {
     [Fact]
-    public void Default_ConstructsWithBadRequest()
+    public void DefaultConstructsWithBadRequest()
     {
         var ex = new BadRequestException();
 

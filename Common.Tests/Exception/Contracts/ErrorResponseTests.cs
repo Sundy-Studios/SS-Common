@@ -8,7 +8,7 @@ public class ErrorResponseTests
     [Fact]
     public void SerializesAndDeserializes()
     {
-        var err = new ErrorResponse(false, 400, "Bad", new[] { "d1" });
+        var err = new ErrorResponse(false, 400, "Bad", ["d1"]);
 
         var json = JsonSerializer.Serialize(err);
         var round = JsonSerializer.Deserialize<ErrorResponse>(json);

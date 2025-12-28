@@ -6,7 +6,7 @@ using Common.Exception.Models;
 public class ForbiddenExceptionTests
 {
     [Fact]
-    public void Default_ConstructsWithForbidden()
+    public void DefaultConstructsWithForbidden()
     {
         var ex = new ForbiddenException();
 

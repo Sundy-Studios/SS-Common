@@ -5,7 +5,7 @@ using Common.Isekai.Attributes;
 public class IsekaiAuthorizeAttributeTests
 {
     [Fact]
-    public void PolicyAndRoles_AreSetFromCtor()
+    public void PolicyAndRolesAreSetFromCtor()
     {
         var attr = new IsekaiAuthorizeAttribute("PolicyX", "RoleA");
 

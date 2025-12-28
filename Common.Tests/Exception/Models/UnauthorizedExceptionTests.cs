@@ -6,7 +6,7 @@ using Common.Exception.Models;
 public class UnauthorizedExceptionTests
 {
     [Fact]
-    public void Default_ConstructsWithUnauthorized()
+    public void DefaultConstructsWithUnauthorized()
     {
         var ex = new UnauthorizedException();
 

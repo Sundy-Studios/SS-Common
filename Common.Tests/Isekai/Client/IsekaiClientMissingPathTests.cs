@@ -8,15 +8,15 @@ public class IsekaiClientMissingPathTests
 {
     public interface ITestService : Common.Isekai.Services.IIsekaiService
     {
-        Task MissingAttr();
+        public Task MissingAttr();
     }
 
     [Fact]
-    public async Task MissingPath_Invocation_ThrowsConflictException()
+    public async Task MissingPathInvocationThrowsConflictException()
     {
-        var http = new HttpClient { BaseAddress = new System.Uri("http://localhost") };
+        var http = new HttpClient { BaseAddress = new Uri("http://localhost") };
         var svc = Common.Isekai.Client.IsekaiClient.Create<ITestService>(http);
 
-        await Assert.ThrowsAsync<ConflictException>(() => svc.MissingAttr());
+        await Assert.ThrowsAsync<ConflictException>(svc.MissingAttr);
     }
 }

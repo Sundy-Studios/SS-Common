@@ -6,7 +6,7 @@ using Common.Exception.Models;
 public class NotFoundExceptionTests
 {
     [Fact]
-    public void Default_ConstructsWithNotFound()
+    public void DefaultConstructsWithNotFound()
     {
         var ex = new NotFoundException();
 
