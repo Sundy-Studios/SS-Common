@@ -55,8 +55,7 @@ jobs:
           FILES=$(git diff-tree --no-commit-id --name-only -r $HEAD_SHA || git show --name-only --pretty="" $HEAD_SHA || true)
           echo -e "Files in latest commit:\n$FILES"
 
-          echo "$FILES" | grep -E "^(Common/|Directory.Packages.props$|Directory.Build.props$|\\.github/workflows/nuget-publish.yml$)" >/dev/null 2>&1
-          if [ $? -eq 0 ]; then
+          if echo "$FILES" | grep -Eq "^(Common/|Directory.Packages.props$|Directory.Build.props$|\\.github/workflows/nuget-publish.yml$)"; then
             echo "run=true" >> $GITHUB_OUTPUT
           else
             echo "run=false" >> $GITHUB_OUTPUT
