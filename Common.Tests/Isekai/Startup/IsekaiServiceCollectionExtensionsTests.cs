@@ -31,6 +31,7 @@ public class IsekaiServiceCollectionExtensionsTests
         Assert.NotNull(resolved);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859:Change return type of method 'CreateDynamicAssemblyWithService' from 'System.Reflection.Assembly' to 'System.Reflection.Emit.AssemblyBuilder' for improved performance", Justification = "Test needs a general Assembly return for compatibility with consumers")]
     private static System.Reflection.Assembly CreateDynamicAssemblyWithService()
     {
         var asmName = new System.Reflection.AssemblyName("DynamicIsekaiTestAssembly");
