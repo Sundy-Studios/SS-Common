@@ -16,36 +16,30 @@ public class IsekaiSwaggerDocumentFilterTests
     {
         [IsekaiPath("/test/{id}", IsekaiHttpMethod.Get)]
         [IsekaiResponse(200, typeof(string), "ok")]
-        Task<string> GetById([IsekaiFromRoute] string id);
+        public Task<string> GetById([IsekaiFromRoute] string id);
 
         [IsekaiPath("/create", IsekaiHttpMethod.Post)]
-        Task Create([IsekaiFromBody] Payload payload);
+        public Task Create([IsekaiFromBody] Payload payload);
 
         [IsekaiPath("/search", IsekaiHttpMethod.Get)]
-        Task Search([IsekaiFromQuery] QueryParams q);
+        public Task Search([IsekaiFromQuery] QueryParams q);
     }
 
     public class Payload { public string Name { get; set; } = ""; }
     public class QueryParams { public int Page { get; set; } }
 
-    private class FakeSchemaGenerator : ISchemaGenerator
+    private sealed class FakeSchemaGenerator : ISchemaGenerator
     {
-        public OpenApiSchema GenerateSchema(Type type, SchemaRepository schemaRepository)
-        {
-            return new OpenApiSchema { Type = type == typeof(string) ? "string" : "object" };
-        }
+        public static OpenApiSchema GenerateSchema(Type type, SchemaRepository _) => new() { Type = type == typeof(string) ? "string" : "object" };
 
-        public OpenApiSchema GenerateSchema(Type type, SchemaRepository schemaRepository, MemberInfo? memberInfo, ParameterInfo? parameterInfo, ApiParameterRouteInfo? apiParameterRouteInfo)
-        {
-            return GenerateSchema(type, schemaRepository);
-        }
+        public OpenApiSchema GenerateSchema(Type type, SchemaRepository schemaRepository, MemberInfo? memberInfo, ParameterInfo? parameterInfo, ApiParameterRouteInfo? apiParameterRouteInfo) => GenerateSchema(type, schemaRepository);
     }
 
     [Fact]
-    public void Apply_AddsPathsAndOperationsAndParameters()
+    public void ApplyAddsPathsAndOperationsAndParameters()
     {
         var filter = new IsekaiSwaggerDocumentFilter();
-        var doc = new OpenApiDocument { Paths = new OpenApiPaths() };
+        var doc = new OpenApiDocument { Paths = [] };
 
         var schemaGen = new FakeSchemaGenerator();
         var schemaRepo = new SchemaRepository();
@@ -56,7 +50,7 @@ public class IsekaiSwaggerDocumentFilterTests
         var ctor = ctxType.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .FirstOrDefault(c => c.GetParameters().Length >= 3);
 
-        var ctx = (DocumentFilterContext)ctor!.Invoke(new object[] { apiDescriptions, schemaGen, schemaRepo });
+        var ctx = (DocumentFilterContext)ctor!.Invoke([apiDescriptions, schemaGen, schemaRepo]);
 
         filter.Apply(doc, ctx);
 

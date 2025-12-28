@@ -2,12 +2,11 @@ namespace Common.Tests.Isekai;
 
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Isekai.Client;
 using Common.Isekai.Attributes;
+using Common.Isekai.Client;
 using Common.Isekai.Services;
 
 public class IsekaiClientInvocationTests
@@ -15,10 +14,10 @@ public class IsekaiClientInvocationTests
     public interface ITestApi : IIsekaiService
     {
         [IsekaiPath("/item/{id}", IsekaiHttpMethod.Get)]
-        Task<string> GetItem(string id);
+        public Task<string> GetItem(string id);
     }
 
-    private class FakeHandler : HttpMessageHandler
+    private sealed class FakeHandler : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -31,9 +30,9 @@ public class IsekaiClientInvocationTests
     }
 
     [Fact]
-    public async Task Proxy_Invoke_CallsHttpClientAndReturnsValue()
+    public async Task ProxyInvokeCallsHttpClientAndReturnsValue()
     {
-        var http = new HttpClient(new FakeHandler()) { BaseAddress = new System.Uri("http://localhost") };
+        var http = new HttpClient(new FakeHandler()) { BaseAddress = new Uri("http://localhost") };
 
         var api = IsekaiClient.Create<ITestApi>(http);
 

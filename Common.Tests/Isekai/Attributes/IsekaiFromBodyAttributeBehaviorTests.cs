@@ -7,7 +7,7 @@ public class IsekaiFromBodyAttributeBehaviorTests
 {
     private sealed class Dummy
     {
-        public static void M([IsekaiFromBody] object body) { }
+        public static void M([IsekaiFromBody] object _) { }
     }
 
     [Fact]

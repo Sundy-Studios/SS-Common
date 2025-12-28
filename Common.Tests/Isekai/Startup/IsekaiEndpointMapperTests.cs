@@ -11,7 +11,7 @@ public class IsekaiEndpointMapperTests
     public interface IMapTestService : IIsekaiService
     {
         [IsekaiPath("/map/test")]
-        Task DoThing();
+        public Task DoThing();
     }
 
     public class MapTestService : IMapTestService
@@ -20,7 +20,7 @@ public class IsekaiEndpointMapperTests
     }
 
     [Fact]
-    public void MapIsekaiEndpoints_DoesNotThrow()
+    public void MapIsekaiEndpointsDoesNotThrow()
     {
         var builder = WebApplication.CreateBuilder();
         var app = builder.Build();

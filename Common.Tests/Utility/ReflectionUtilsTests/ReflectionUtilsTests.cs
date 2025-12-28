@@ -1,12 +1,11 @@
 namespace Common.Tests.Utility;
 
-using System.Reflection;
 using Common.Utility;
 
 public class ReflectionUtilsTests
 {
     [Fact]
-    public void GetLoadableTypes_ReturnsTypesFromAssembly()
+    public void GetLoadableTypesReturnsTypesFromAssembly()
     {
         var asm = typeof(ReflectionUtils).Assembly;
 

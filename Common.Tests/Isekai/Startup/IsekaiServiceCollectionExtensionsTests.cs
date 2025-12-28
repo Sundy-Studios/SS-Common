@@ -13,7 +13,7 @@ public class IsekaiServiceCollectionExtensionsTests
     public class TestSvc : ITestSvc { }
 
     [Fact]
-    public void AddIsekai_RegistersServiceImplementation()
+    public void AddIsekaiRegistersServiceImplementation()
     {
         var services = new ServiceCollection();
 
@@ -53,7 +53,7 @@ public class IsekaiServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddIsekaiClient_RegistersClientSingleton()
+    public void AddIsekaiClientRegistersClientSingleton()
     {
         var services = new ServiceCollection();
         var http = new HttpClient { BaseAddress = new Uri("http://localhost") };

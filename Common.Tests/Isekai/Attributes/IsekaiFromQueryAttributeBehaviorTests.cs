@@ -7,7 +7,7 @@ public class IsekaiFromQueryAttributeBehaviorTests
 {
     private sealed class Dummy
     {
-        public static void M([IsekaiFromQuery] string q) { }
+        public static void M([IsekaiFromQuery] string _) { }
     }
 
     [Fact]

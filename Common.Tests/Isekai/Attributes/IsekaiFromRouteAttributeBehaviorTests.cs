@@ -7,7 +7,7 @@ public class IsekaiFromRouteAttributeBehaviorTests
 {
     private sealed class Dummy
     {
-        public static void M([IsekaiFromRoute] string id) { }
+        public static void M([IsekaiFromRoute] string _) { }
     }
 
     [Fact]
