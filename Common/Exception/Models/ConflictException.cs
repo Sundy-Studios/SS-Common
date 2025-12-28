@@ -15,4 +15,9 @@ public sealed class ConflictException : CommonHttpException
         : base(HttpStatusCode.Conflict, message, [message])
     {
     }
+
+    public ConflictException(IReadOnlyList<string> details)
+        : base(HttpStatusCode.Conflict, null, details)
+    {
+    }
 }
