@@ -3,9 +3,9 @@ namespace Common.Isekai.Startup;
 using System;
 using System.Linq;
 using System.Reflection;
+using Common.Isekai.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Common.Isekai.Attributes;
 
 internal static class IsekaiAuthorization
 {
@@ -22,7 +22,10 @@ internal static class IsekaiAuthorization
             .Concat(method.GetCustomAttributes<IsekaiAuthorizeAttribute>(true))
             .ToArray();
 
-        if (authorizeAttributes.Length == 0) return;
+        if (authorizeAttributes.Length == 0)
+        {
+            return;
+        }
 
         foreach (var attr in authorizeAttributes)
         {

@@ -88,7 +88,7 @@ internal sealed class IsekaiExceptionStartupFilter : IStartupFilter
 #if DEBUG
         if (ex?.StackTrace != null)
         {
-            details = new List<string> { ex.StackTrace };
+            details = [ex.StackTrace];
         }
 #endif
 

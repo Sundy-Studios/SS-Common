@@ -18,7 +18,7 @@ public static class IsekaiEndpointMapper
 {
     public static WebApplication MapIsekaiEndpoints(this WebApplication app, Assembly? assembly = null)
     {
-        var assemblies = assembly != null ? new[] { assembly } : AppDomain.CurrentDomain.GetAssemblies();
+        var assemblies = assembly != null ? [assembly] : AppDomain.CurrentDomain.GetAssemblies();
         var allTypes = assemblies.SelectMany(ReflectionUtils.GetLoadableTypes);
 
         var serviceInterfaces = allTypes
@@ -27,14 +27,20 @@ public static class IsekaiEndpointMapper
         foreach (var iface in serviceInterfaces)
         {
             var impl = allTypes.FirstOrDefault(t => iface.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract);
-            if (impl == null) continue;
+            if (impl == null)
+            {
+                continue;
+            }
 
             foreach (var method in iface.GetMethods())
             {
                 var pathAttr = method.GetCustomAttribute<IsekaiPathAttribute>();
-                if (pathAttr == null) continue;
+                if (pathAttr == null)
+                {
+                    continue;
+                }
 
-                RouteHandlerBuilder builder = pathAttr.Method switch
+                var builder = pathAttr.Method switch
                 {
                     IsekaiHttpMethod.Get => app.MapGet(pathAttr.Path, (IServiceProvider sp, HttpContext ctx) => InvokeIsekaiMethod(sp, iface, method, ctx)),
                     IsekaiHttpMethod.Post => app.MapPost(pathAttr.Path, (IServiceProvider sp, HttpContext ctx) => InvokeIsekaiMethod(sp, iface, method, ctx)),
@@ -96,7 +102,7 @@ public static class IsekaiEndpointMapper
             values.Add(null);
         }
 
-        return values.ToArray();
+        return [.. values];
     }
 
     private static async Task<IResult> InvokeIsekaiMethod(IServiceProvider sp, Type iface, MethodInfo method, HttpContext ctx)

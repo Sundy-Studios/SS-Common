@@ -20,7 +20,7 @@ public static class IsekaiServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddIsekai(this IServiceCollection services, Assembly? assembly = null)
     {
-        var assemblies = assembly != null ? new[] { assembly } : AppDomain.CurrentDomain.GetAssemblies();
+        var assemblies = assembly != null ? [assembly] : AppDomain.CurrentDomain.GetAssemblies();
         var allTypes = assemblies.SelectMany(ReflectionUtils.GetLoadableTypes);
 
         var serviceInterfaces = allTypes
