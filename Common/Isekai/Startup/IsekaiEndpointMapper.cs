@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-internal static class IsekaiEndpointMapper
+public static class IsekaiEndpointMapper
 {
     public static WebApplication MapIsekaiEndpoints(this WebApplication app, Assembly? assembly = null)
     {
