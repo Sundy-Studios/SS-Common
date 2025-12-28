@@ -34,25 +34,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
-
-      - name: Determine head SHA
-        id: determine
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            HEAD_SHA=$(jq -r .pull_request.head.sha < $GITHUB_EVENT_PATH)
-          else
-            HEAD_SHA=${{ github.sha }}
-          fi
-          echo "head_sha=$HEAD_SHA" >> $GITHUB_OUTPUT
+          fetch-depth: 0
 
       - name: List files changed in latest commit
         id: check
         run: |
-          HEAD_SHA=$(jq -r .head_sha < $GITHUB_OUTPUT 2>/dev/null || echo "${{ github.sha }}")
-          git fetch --no-tags --prune --depth=2 origin $HEAD_SHA || true
-          FILES=$(git diff-tree --no-commit-id --name-only -r $HEAD_SHA || true)
-          echo "Files in latest commit:\n$FILES"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            HEAD_SHA=$(jq -r .pull_request.head.sha < $GITHUB_EVENT_PATH)
+          else
+            HEAD_SHA=${GITHUB_SHA}
+          fi
+
+          echo "Checking head $HEAD_SHA"
+
+          git fetch --no-tags --prune origin $HEAD_SHA || true
+          if ! git cat-file -e ${HEAD_SHA}^{commit} 2>/dev/null; then
+            git fetch --no-tags --prune origin +refs/heads/*:refs/remotes/origin/* --depth=1 || true
+          fi
+
+          FILES=$(git diff-tree --no-commit-id --name-only -r $HEAD_SHA || git show --name-only --pretty="" $HEAD_SHA || true)
+          echo -e "Files in latest commit:\n$FILES"
 
           echo "$FILES" | grep -E "^(Common/|Directory.Packages.props$|Directory.Build.props$|\\.github/workflows/nuget-publish.yml$)" >/dev/null 2>&1
           if [ $? -eq 0 ]; then
