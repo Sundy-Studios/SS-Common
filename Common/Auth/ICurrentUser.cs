@@ -1,17 +1,17 @@
-using System.Security.Claims;
-
 namespace Common.Auth;
+
+using System.Security.Claims;
 
 public interface ICurrentUser
 {
-    bool IsAuthenticated { get; }
+    public bool IsAuthenticated { get; }
 
-    string? UserId { get; }
-    string? Email { get; }
+    public string? UserId { get; }
+    public string? Email { get; }
 
-    bool EmailVerified { get; }
+    public bool EmailVerified { get; }
 
-    string? Provider { get; }
+    public string? Provider { get; }
 
-    IReadOnlyCollection<Claim> Claims { get; }
+    public IReadOnlyCollection<Claim> Claims { get; }
 }

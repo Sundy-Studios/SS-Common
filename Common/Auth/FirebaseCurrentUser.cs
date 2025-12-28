@@ -1,16 +1,11 @@
+namespace Common.Auth;
+
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
-namespace Common.Auth;
-
-internal sealed class FirebaseCurrentUser : ICurrentUser
+public class FirebaseCurrentUser(IHttpContextAccessor contextAccessor) : ICurrentUser
 {
-    private readonly IHttpContextAccessor _contextAccessor;
-
-    public FirebaseCurrentUser(IHttpContextAccessor contextAccessor)
-    {
-        _contextAccessor = contextAccessor;
-    }
+    private readonly IHttpContextAccessor _contextAccessor = contextAccessor;
 
     private ClaimsPrincipal? User =>
         _contextAccessor.HttpContext?.User;
@@ -35,10 +30,7 @@ internal sealed class FirebaseCurrentUser : ICurrentUser
         ?? GetClaim("sign_in_provider");
 
     public IReadOnlyCollection<Claim> Claims =>
-        User?.Claims?.ToArray() ?? Array.Empty<Claim>();
+        User?.Claims?.ToArray() ?? [];
 
-    private string? GetClaim(string type)
-    {
-        return User?.Claims.FirstOrDefault(c => c.Type == type)?.Value;
-    }
+    private string? GetClaim(string type) => User?.Claims.FirstOrDefault(c => c.Type == type)?.Value;
 }
