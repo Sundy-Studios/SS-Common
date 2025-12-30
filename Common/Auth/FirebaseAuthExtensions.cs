@@ -33,6 +33,7 @@ public static class FirebaseAuthExtensions
             });
 
         services.AddAuthorization();
+        services.AddScoped<ICurrentUser, FirebaseCurrentUser>();
 
         return services;
     }
