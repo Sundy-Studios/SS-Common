@@ -30,6 +30,20 @@ public static class FirebaseAuthExtensions
                     ValidateAudience = true,
                     ValidateLifetime = true
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"Auth failed: {context.Exception}");
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        Console.WriteLine($"Token validated: {context.Principal?.Identity?.Name}");
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         services.AddAuthorization();
