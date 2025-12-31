@@ -1,11 +1,10 @@
 namespace Common.Auth;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Http;
-using System.Text.Json;
 
 public static class FirebaseAuthExtensions
 {
@@ -45,7 +44,7 @@ public static class FirebaseAuthExtensions
                         var user = context.Principal;
                         Console.WriteLine("Token validated for user today:");
                         Console.WriteLine($"Name: {user?.Identity?.Name}");
-                        Console.WriteLine($"Claims: {string.Join(", ", user?.Claims.Select(c => $"{c.Type}={c.Value}") ?? Array.Empty<string>())}");
+                        Console.WriteLine($"Claims: {string.Join(", ", user?.Claims.Select(c => $"{c.Type}={c.Value}") ?? [])}");
                         return Task.CompletedTask;
                     }
                 };
@@ -53,7 +52,7 @@ public static class FirebaseAuthExtensions
 
         services.AddAuthorization();
         services.AddHttpContextAccessor();
-        
+
         services.AddScoped<ICurrentUser>(sp =>
         {
             var accessor = sp.GetRequiredService<IHttpContextAccessor>();
