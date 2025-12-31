@@ -41,10 +41,10 @@ public static class FirebaseAuthExtensions
                     },
                     OnTokenValidated = context =>
                     {
-                        Console.WriteLine("Validated User: {User}", JsonSerializer.Serialize(context, new JsonSerializerOptions
-                        {
-                            WriteIndented = true
-                        }));
+                        var user = context.Principal;
+                        Console.WriteLine("Token validated for user:");
+                        Console.WriteLine($"Name: {user?.Identity?.Name}");
+                        Console.WriteLine($"Claims: {string.Join(", ", user?.Claims.Select(c => $"{c.Type}={c.Value}") ?? Array.Empty<string>())}");
                         return Task.CompletedTask;
                     }
                 };
