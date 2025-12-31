@@ -9,6 +9,7 @@ on:
       - "Common/**"
       - "Directory.Packages.props"
       - "Directory.Build.props"
+      - ".github/workflows/nuget-publish.yml"
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
@@ -17,13 +18,52 @@ on:
       - "Common/**"
       - "Directory.Packages.props"
       - "Directory.Build.props"
+      - ".github/workflows/nuget-publish.yml"
 
 permissions:
   contents: read
   packages: write
 
 jobs:
+  check-latest-commit:
+    name: Check latest commit for relevant paths
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: List files changed in latest commit
+        id: check
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            HEAD_SHA=$(jq -r .pull_request.head.sha < $GITHUB_EVENT_PATH)
+          else
+            HEAD_SHA=${GITHUB_SHA}
+          fi
+
+          echo "Checking head $HEAD_SHA"
+
+          git fetch --no-tags --prune origin $HEAD_SHA || true
+          if ! git cat-file -e ${HEAD_SHA}^{commit} 2>/dev/null; then
+            git fetch --no-tags --prune origin +refs/heads/*:refs/remotes/origin/* --depth=1 || true
+          fi
+
+          FILES=$(git diff-tree --no-commit-id --name-only -r $HEAD_SHA || git show --name-only --pretty="" $HEAD_SHA || true)
+          echo -e "Files in latest commit:\n$FILES"
+
+          if echo "$FILES" | grep -Eq "^(Common/|Directory.Packages.props$|Directory.Build.props$|\\.github/workflows/nuget-publish.yml$)"; then
+            echo "run=true" >> $GITHUB_OUTPUT
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+          fi
+
   build-and-pack:
+    needs: check-latest-commit
+    if: ${{ needs.check-latest-commit.outputs.run == 'true' }}
     runs-on: ubuntu-latest
 
     steps:

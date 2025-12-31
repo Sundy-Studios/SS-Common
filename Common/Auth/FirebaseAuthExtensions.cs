@@ -1,6 +1,7 @@
 namespace Common.Auth;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -30,9 +31,33 @@ public static class FirebaseAuthExtensions
                     ValidateAudience = true,
                     ValidateLifetime = true
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"Auth failed: {context.Exception}");
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        var user = context.Principal;
+                        Console.WriteLine("Token validated for user today:");
+                        Console.WriteLine($"Name: {user?.Identity?.Name}");
+                        Console.WriteLine($"Claims: {string.Join(", ", user?.Claims.Select(c => $"{c.Type}={c.Value}") ?? [])}");
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         services.AddAuthorization();
+        services.AddHttpContextAccessor();
+
+        services.AddScoped<ICurrentUser>(sp =>
+        {
+            var accessor = sp.GetRequiredService<IHttpContextAccessor>();
+            return new FirebaseCurrentUser(accessor);
+        });
 
         return services;
     }
