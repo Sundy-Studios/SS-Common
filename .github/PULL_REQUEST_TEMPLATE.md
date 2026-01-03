@@ -8,7 +8,7 @@
 
 <!-- List the related Jira tickets here. Example format: -->
 
--   [Scrum 2](https://sundystudios.atlassian.net/browse/SCRUM-2)
+-   [SS-1234](https://sundystudios.atlassian.net/browse/SS-1234)
 
 ## Illustrations / Screenshots
 
