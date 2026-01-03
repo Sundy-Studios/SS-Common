@@ -21,8 +21,12 @@ internal class IsekaiClientProxy : DispatchProxy
 
     public void SetHttpClient(HttpClient httpClient) => _httpClient = httpClient;
 
-    protected override object? Invoke(MethodInfo targetMethod, object?[] args)
+    protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
     {
+        ArgumentNullException.ThrowIfNull(targetMethod);
+
+        args ??= [];
+
         var task = InvokeAsync(targetMethod, args);
 
         // Determine the return type
