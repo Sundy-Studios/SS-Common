@@ -1,5 +1,6 @@
 namespace SS.Common.Logging;
 
+using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Serilog;
 using Serilog.Sinks.SumoLogic;
@@ -24,7 +25,9 @@ public static class SumoLoggingExtensions
         }
 
         // Always log to console
-        loggerConfig = loggerConfig.WriteTo.Console();
+        loggerConfig = loggerConfig.WriteTo.Console(
+            formatProvider: CultureInfo.InvariantCulture
+        );
 
         Log.Logger = loggerConfig.CreateLogger();
 
